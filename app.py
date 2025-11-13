@@ -1,39 +1,45 @@
 import streamlit as st
-from modules.users import login, signup, get_current_user
-from modules.posts import show_feed, create_post
-from modules.friends import show_friends, send_friend_request
-from modules.notifications import show_notifications
+from modules.users import login_ui, signup_ui, get_current_user, logout
+from modules.posts import create_post_ui, show_feed_ui
+from modules.friends import show_friends_ui, send_friend_request_ui
+from modules.notifications import show_notifications_ui
+from modules.chat import chat_ui
+from modules.events import events_ui
 
 # Load CSS
 with open("style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Page config
 st.set_page_config(page_title="Brood App", layout="wide")
 st.title("🐣 Brood App")
 
-# ------------------- Authentication -------------------
+# ---------------- Authentication ----------------
 current_user = get_current_user()
 if not current_user:
     st.subheader("Login or Signup")
     col1, col2 = st.columns(2)
     with col1:
-        login()
+        login_ui()
     with col2:
-        signup()
+        signup_ui()
 else:
-    # ------------------- Sidebar -------------------
+    # ---------------- Sidebar ----------------
     st.sidebar.header(f"{current_user['username']}'s Profile")
     st.sidebar.image(current_user["avatar"])
     st.sidebar.markdown(f"**Bio:** {current_user['bio']}")
-
     if st.sidebar.button("Logout"):
-        st.session_state.pop("current_user")
+        logout()
         st.experimental_rerun()
 
-    show_notifications()
-    show_friends()
+    # Notifications & Friends
+    show_notifications_ui()
+    show_friends_ui()
+    send_friend_request_ui()
 
-    # ------------------- Main Feed -------------------
-    create_post()
-    show_feed()
+    # ---------------- Main Feed ----------------
+    create_post_ui()
+    show_feed_ui()
+
+    # ---------------- Chat & Events ----------------
+    chat_ui()
+    events_ui()
